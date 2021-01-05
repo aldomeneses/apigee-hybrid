@@ -1,5 +1,7 @@
 # Apigee Hybrid on GCP
 
+![img](img/apigee.png)
+
 **Index**
 - [Apigee Hybrid on GCP](#apigee-hybrid-on-gcp)
   - [Overview](#overview)
