@@ -2,6 +2,8 @@
 
 ![img](img/apigee.png)
 
+----
+
 **Index**
 - [Apigee Hybrid on GCP](#apigee-hybrid-on-gcp)
   - [Overview](#overview)
@@ -34,6 +36,9 @@
 - [Management plane configuration](#management-plane-configuration)
   - [Enable Synchronizer access](#enable-synchronizer-access)
   - [Configure the MART endpoint](#configure-the-mart-endpoint)
+- [Test the hybrid installation](#test-the-hybrid-installation)
+  - [Build a test proxy](#build-a-test-proxy)
+  - [Call the test proxy](#call-the-test-proxy)
 
 ## Overview
 
@@ -432,3 +437,44 @@ curl -v -X PUT \
 }'
 
 ```
+
+# Test the hybrid installation
+
+ Test the hybrid installation by creating and deploying a simple API proxy to the test environment in the runtime plane. After the proxy is deployed, you make a request to the API and verify the response. You will also validate that the analytics data collection components are working as expected.
+
+ ## Build a test proxy
+ 
+ 1. Access the Apigee hybrid UI in an incognitor browser window (or switch to its tab if you have it open already).
+ 2. In the left navigation pane, click **Develop > API Proxies**.
+ 3. Click **+Proxy** in the upper right.
+ 4. Click **Reverse proxy (most common)**.
+ 5. On the **Create Proxy** page, configure proxy details with the following settings:
+ 6. Click **Next**.
+ 7. On the **Policies** page, for **Security: Authorization**, select **Pass through (no authorization)**.
+ 8. Clic **Next**.
+ 9. On the **Summary** page, verify your entries. Then, select **test** to deploy the proxy to the test environment.
+ 10. Click **Create and deploy**.
+
+## Call the test proxy
+
+1. In the Cloud Shell window, set an environment variable to contain the value of the external IP address of the istio-ingressgateway hybrid runtime component:
+   ```
+   export LB_EXTERNAL_IP=`kubectl -n istio-system get svc -l app=istio-ingressgateway -o=jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}{"\n"}'`
+   ```
+2. To invoke the TestInstall API proxy, run the following command:
+   ```
+   curl https://${INGRESS_FQDN}/v1/testinstall/418 --http1.1 --resolve "${INGRESS_FQDN}:443:${LB_EXTERNAL_IP}" -k
+   ```
+3. Verify that the response from the API is:
+   ```
+
+    -=[ teapot ]=-
+
+       _...._
+     .'  _ _ `.
+    | ."` ^ `". _,
+    \_;`"---"`|//
+      |       ;/
+      \_     _/
+        `"""`
+   ```
